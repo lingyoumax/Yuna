@@ -6,8 +6,15 @@ import faiss
 import numpy as np
 import pandas as pd
 
-from config import API_KEY
+from config import API_KEY, BASE_URL
 from settings import saveDir, shortMemoryLen, EmbeddingDimension, LLMModel, EmbeddingModel, topK
+
+def getClient():
+    client = OpenAI(
+        api_key = API_KEY,
+        base_url= BASE_URL,
+    )
+    return client
 
 def init():
     os.makedirs(saveDir, exist_ok=True)
@@ -51,10 +58,7 @@ def updateShortMemory(shortMemory: List[Dict]) -> List[Dict]:
     return shortMemory
     
 def getLLMResponse(messages: List[Dict], enable_thinking: bool = False) -> str:
-    client = OpenAI(
-        api_key = API_KEY,
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-    )
+    client = getClient()
     completion = client.chat.completions.create(
         model = LLMModel,
         messages = messages,
@@ -63,10 +67,7 @@ def getLLMResponse(messages: List[Dict], enable_thinking: bool = False) -> str:
     return completion.choices[0].message.content
 
 def getEmbeddingResponse(message: str) -> str:
-    client = OpenAI(
-        api_key = API_KEY,
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-    )
+    client = getClient()
     completion = client.embeddings.create(
         model = EmbeddingModel,
         input = message,
