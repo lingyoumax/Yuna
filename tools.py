@@ -1,7 +1,6 @@
 from typing import List, Dict
 from openai import OpenAI
 import os
-import csv
 import faiss
 import numpy as np
 import pandas as pd
