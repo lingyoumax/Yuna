@@ -15,7 +15,7 @@ if __name__ =="__main__":
         relativeMessages = getRelativeMessages(userEmbedding, historyMessages, embeddingsGraph)
         addEmbedding(embeddingsGraph, userEmbedding)
         response = getLLMResponse(relativeMessages + shortMemory)
-        print(response) #记得增加流式输出
+        print(response)
         assistantEmbedding = getEmbeddingResponse(response)
         addEmbedding(embeddingsGraph, assistantEmbedding)
         shortMemory.append({"role": "assistant", "content": response})
