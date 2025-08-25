@@ -1,24 +1,23 @@
 from datetime import datetime
 
-from tools import init, getLLMResponse, saveMessages, getRelativeMessages, getEmbeddingResponse
-from settings import shortMemoryLen, LLMModel, EmbeddingModel
+from tools import init, getLLMResponse, save, getRelativeMessages, getEmbeddingResponse, updateShortMemory, addEmbedding
 
 if __name__ =="__main__":
-    presavedMessages=[]
-    shortMemory, embeddingsGraph = init()
+    historyMessages, shortMemory, embeddingsGraph = init()
     while True:
         userMessage = input("请输入：")
         if userMessage == "exit":
             break
         shortMemory.append({"role": "user", "content": userMessage})
-        presavedMessages.append({"role": "user", "content": userMessage, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
-        if len(shortMemory) > shortMemoryLen:
-            shortMemory = shortMemory[-shortMemoryLen:]
-        relativeMessages = getRelativeMessages(userMessage)
-        userEmbedding = getEmbeddingResponse(userMessage, EmbeddingModel) 
-        response = getLLMResponse(relativeMessages + shortMemory, model = LLMModel)
+        historyMessages.loc[len(historyMessages)] = {"role": "user", "content": userMessage, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        shortMemory = updateShortMemory(shortMemory)    
+        userEmbedding = getEmbeddingResponse(userMessage)
+        relativeMessages = getRelativeMessages(userEmbedding, historyMessages, embeddingsGraph)
+        addEmbedding(embeddingsGraph, userEmbedding)
+        response = getLLMResponse(relativeMessages + shortMemory)
         print(response) #记得增加流式输出
+        assistantEmbedding = getEmbeddingResponse(response)
+        addEmbedding(embeddingsGraph, assistantEmbedding)
         shortMemory.append({"role": "assistant", "content": response})
-        presavedMessages.append({"role": "assistant", "content": response, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
-
-saveMessages(presavedMessages, embeddingsGraph)
+        historyMessages.loc[len(historyMessages)] = {"role": "assistant", "content": response, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    save(historyMessages, embeddingsGraph)
