@@ -2,7 +2,7 @@ from datetime import datetime
 
 from tools import init, getLLMResponse, save, getRelativeMessages, getEmbeddingResponse, updateShortMemory, addEmbedding
 
-if __name__ =="__main__":
+def main():
     historyMessages, shortMemory, embeddingsGraph = init()
     while True:
         userMessage = input("请输入：")
@@ -21,3 +21,6 @@ if __name__ =="__main__":
         shortMemory.append({"role": "assistant", "content": response})
         historyMessages.loc[len(historyMessages)] = {"role": "assistant", "content": response, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
     save(historyMessages, embeddingsGraph)
+
+if __name__ =="__main__":
+    main()
