@@ -36,7 +36,7 @@ def init():
     else:
         dim = EmbeddingDimension
         M = 32
-        efConstruction = 200
+        efConstruction = 256
         base = faiss.IndexHNSWFlat(dim, M, faiss.METRIC_INNER_PRODUCT)
         base.hnsw.efConstruction = efConstruction
         index = faiss.IndexIDMap2(base)
